@@ -1,7 +1,7 @@
 import "./App.css";
 
 import Main from "./layouts/Main";
-
+import UserList from "./components/user/UserList";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import { Routes, Route } from "react-router-dom";
@@ -16,6 +16,7 @@ function App() {
         <Route element={<Main />}>
           <Route element={<PrivateRoutes></PrivateRoutes>}>
             <Route path="/" element={<Dashboard />} />
+            <Route path='/users' element={<UserList />} />
           </Route>
         </Route>
         <Route element={<PublicRoutes></PublicRoutes>}>
