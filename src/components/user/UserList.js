@@ -1,4 +1,4 @@
-import React, { useEffect ,useState} from "react";
+import React, { useEffect, useState } from "react";
 import DataTable from "../common/DataTable";
 import { useDispatch } from "react-redux";
 import * as actions from "../../redux/actions";
@@ -7,14 +7,18 @@ const UserList = () => {
   const dispatch = useDispatch();
   const [users, setUsers] = useState([]);
 
-  const [numOfPage, setNumOfPage] = useState(1)
-  const [currentPage, setCurrentPage] = useState(1)
+  const [numOfPage, setNumOfPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
   useEffect(() => {
     dispatch(actions.controlLoading(true));
     requestApi(`/user`, "GET", [])
       .then((response) => {
         console.log("response = >", response);
         setUsers(response.data.data);
+        
+
+        setNumOfPage(response.data.lastPage)
+
         dispatch(actions.controlLoading(false));
       })
       .catch((err) => {
@@ -23,42 +27,45 @@ const UserList = () => {
       });
   }, []);
 
-
   const columns = [
     {
-        name: "ID",
-        element: row => row.id
+      name: "ID",
+      element: (row) => row.id,
     },
     {
-        name: "First name",
-        element: row => row.first_name
+      name: "First name",
+      element: (row) => row.first_name,
     },
     {
-        name: "Last name",
-        element: row => row.last_name
+      name: "Last name",
+      element: (row) => row.last_name,
     },
     {
-        name: "Email",
-        element: row => row.email
+      name: "Email",
+      element: (row) => row.email,
     },
     {
-        name: "Created at",
-        element: row => row.created_at
+      name: "Created at",
+      element: (row) => row.created_at,
     },
     {
-        name: "Updated at",
-        element: row => row.updated_at
+      name: "Updated at",
+      element: (row) => row.updated_at,
     },
     {
-        name: "Actions",
-        element: row => (
-            <>
-                <button type="button" className="btn btn-sm btn-warning me-1"><i className="fa fa-pencil"></i> Edit</button>
-                <button type="button" className="btn btn-sm btn-danger me-1" ><i className="fa fa-trash"></i> Delete</button>
-            </>
-        )
-    }
-]
+      name: "Actions",
+      element: (row) => (
+        <>
+          <button type="button" className="btn btn-sm btn-warning me-1">
+            <i className="fa fa-pencil"></i> Edit
+          </button>
+          <button type="button" className="btn btn-sm btn-danger me-1">
+            <i className="fa fa-trash"></i> Delete
+          </button>
+        </>
+      ),
+    },
+  ];
 
   return (
     <div id="layoutSidenav_content">
@@ -75,26 +82,20 @@ const UserList = () => {
             <button type="button" className="btn btn-sm btn-success me-2">
               <i className="fa fa-plus"></i> Add new
             </button>
-           
-              <button
-                type="button"
-                className="btn btn-sm btn-danger"
-               
-              >
-                <i className="fa fa-trash"></i> Delete
-              </button>
-        
+
+            <button type="button" className="btn btn-sm btn-danger">
+              <i className="fa fa-trash"></i> Delete
+            </button>
           </div>
           <DataTable
             name="List Users"
             data={users}
             columns={columns}
             numOfPage={numOfPage}
-currentPage = {currentPage}
+            currentPage={currentPage}
           ></DataTable>
         </div>
       </main>
-     
     </div>
   );
 };
