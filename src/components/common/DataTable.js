@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from "react";
+import LiveSearch from "./LiveSearch";
 
 const DataTable = (props) => {
-  const { name, data, columns, currentPage, numOfPage } = props;
+  const {
+    name,
+    data,
+    columns,
+    currentPage,
+    numOfPage,
+    onPageChange,
+    onChangeItemsPerPage,
+    onKeySearch
+  } = props;
   const renderHeaders = () => {
     return columns.map((col, index) => <th key={index}>{col.name}</th>);
   };
@@ -25,24 +35,51 @@ const DataTable = (props) => {
     const nextPage = currentPage + 1 > numOfPage ? null : currentPage + 1;
     const prevPage = currentPage - 1 < 1 ? null : currentPage - 1;
     pagination.push(
-      <li key="prev" className="page-item">
-        <button className="page-link">&laquo;</button>
+      <li key="prev" className={prevPage ? "page-item" : "page-item disabled"}>
+        <button className="page-link" onClick={() => onPageChange(prevPage)}>
+          &laquo;
+        </button>
       </li>
     );
+    // css in Boostrap active
+    // <nav class="p-2" aria-label="Pagination">
+    //   <ul class="pagination justify-content-end mb-0 flex-wrap">
+    //   <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+    //   <li class="page-item active"><a class="page-link" href="#">1</a></li>
+    //   <li class="page-item active"><a class="page-link" href="#">2</a></li>
+    //   <li class="page-item active"><a class="page-link" href="#">3</a></li>
+    //   <li class="page-item"><a class="page-link" href="#">Next</a></li>
+    // </ul>
+    // </nav>
     for (let i = 1; i <= numOfPage; i++) {
       pagination.push(
-        <li key={i} className="page-item">
-          <button className="page-link">{i}</button>
+        <li
+          key={i}
+          className={currentPage === i ? "page-item active" : "page-item"}
+        >
+          <button className="page-link" onClick={() => onPageChange(i)}>
+            {i}
+          </button>
         </li>
       );
     }
 
     pagination.push(
-      <li key="next" className="page-item">
-        <button className="page-link">&raquo;</button>
+      <li key="next" className={nextPage ? "page-item" : "page-item disabled"}>
+        <button className="page-link" onClick={() => onPageChange(nextPage)}>
+          &raquo;
+        </button>
       </li>
     );
     return pagination;
+  };
+  const onChangeOption = (event) => {
+    const target = event.target;
+    console.log("-----target---");
+    console.log(target);
+    console.log("----target-----------");
+    console.log("change item per page to=> ", target.value);
+    onChangeItemsPerPage(target.value);
   };
   return (
     <div>
@@ -59,6 +96,7 @@ const DataTable = (props) => {
                 <select
                   name="example_length"
                   className="form-select form-select-sm ms-1 me-1"
+                  onChange={onChangeOption}
                 >
                   <option value="1">1</option>
                   <option value="2">2</option>
@@ -70,7 +108,9 @@ const DataTable = (props) => {
               </label>
             </div>
             <div className="col-sm-12 col-md-6">
-              <label className="d-inline-flex float-end">Search:</label>
+              <label className="d-inline-flex float-end">Search:
+              <LiveSearch onKeySearch={onKeySearch}/>
+              </label>
             </div>
           </div>
           <table
@@ -89,13 +129,15 @@ const DataTable = (props) => {
               </tr>
             </tfoot>
           </table>
-          <div className="row">
-            <div className="col-sm-12 col-md-7">
-              <ul className="pagination justify-content-end">
-                {renderPagination()}
-              </ul>
+          {numOfPage > 1 && (
+            <div className="row">
+              <div className="col-sm-12 col-md-7">
+                <ul className="pagination justify-content-end">
+                  {renderPagination()}
+                </ul>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
