@@ -9,15 +9,17 @@ const UserList = () => {
 
   const [numOfPage, setNumOfPage] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(1);
+  const [searchString, setSearchString] = useState("");
   useEffect(() => {
     dispatch(actions.controlLoading(true));
-    requestApi(`/user`, "GET", [])
+    let query = `?items_per_page=${itemsPerPage}&page=${currentPage}&search=${searchString}`;
+    requestApi(`/user${query}`, "GET", [])
       .then((response) => {
         console.log("response = >", response);
         setUsers(response.data.data);
-        
 
-        setNumOfPage(response.data.lastPage)
+        setNumOfPage(response.data.lastPage);
 
         dispatch(actions.controlLoading(false));
       })
@@ -25,7 +27,7 @@ const UserList = () => {
         console.log(err);
         dispatch(actions.controlLoading(false));
       });
-  }, []);
+  }, [currentPage, itemsPerPage, searchString]);
 
   const columns = [
     {
@@ -93,6 +95,12 @@ const UserList = () => {
             columns={columns}
             numOfPage={numOfPage}
             currentPage={currentPage}
+            onPageChange={setCurrentPage}
+            onChangeItemsPerPage={setItemsPerPage}
+            onKeySearch={(keyword) => {
+              console.log("keyword in user list comp=> ", keyword);
+              setSearchString(keyword);
+            }}
           ></DataTable>
         </div>
       </main>
