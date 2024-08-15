@@ -10,14 +10,33 @@ const DataTable = (props) => {
     numOfPage,
     onPageChange,
     onChangeItemsPerPage,
-    onKeySearch
+    onKeySearch,
+    onSelectedRows
   } = props;
+
+  const [selectedRows, setSelectedRows] = useState([]);
   const renderHeaders = () => {
     return columns.map((col, index) => <th key={index}>{col.name}</th>);
   };
+
+  useEffect(() => {
+    console.log("Selected Row", selectedRows);
+    onSelectedRows(selectedRows)
+  }, [selectedRows]);
+
   const renderData = () => {
     return data.map((item, index) => (
       <tr key={index}>
+        <td>
+          <input
+            type="checkbox"
+            checked={selectedRows.includes(String(item.id)) ? true : false}
+            className="form-check-input"
+            value={item.id}
+            onChange={onClickCheckbox}
+          />
+        </td>
+
         {columns.map((col, ind) => (
           <td key={ind}>
             {typeof col.element === "function" ? (
@@ -29,6 +48,32 @@ const DataTable = (props) => {
         ))}
       </tr>
     ));
+  };
+  const onSelectAll = (event) => {
+    if (event.target.checked) {
+      const temp = data.map((element) => String(element.id));
+      setSelectedRows(temp);
+    } else {
+      setSelectedRows([]);
+    }
+  };
+  const onClickCheckbox = (event) => {
+    let checked = event.target.checked;
+    let value = event.target.value;
+    if (checked) {
+      if (!selectedRows.includes(value)) {
+        setSelectedRows([...selectedRows, value]);
+      }
+    } else {
+      //neu bi huy chon thi su dung
+      // truy van ra phan index cua phan huy chon
+      let index = selectedRows.indexOf(value);
+      // xet cai temp  la mang selected Row Hien Tai
+      const temp = [...selectedRows];
+      //loai bo no ra KHOI MANG
+      temp.splice(index, 1);
+      setSelectedRows(temp);
+    }
   };
   const renderPagination = () => {
     const pagination = [];
@@ -108,8 +153,9 @@ const DataTable = (props) => {
               </label>
             </div>
             <div className="col-sm-12 col-md-6">
-              <label className="d-inline-flex float-end">Search:
-              <LiveSearch onKeySearch={onKeySearch}/>
+              <label className="d-inline-flex float-end">
+                Search:
+                <LiveSearch onKeySearch={onKeySearch} />
               </label>
             </div>
           </div>
@@ -119,7 +165,23 @@ const DataTable = (props) => {
             width="100%"
           >
             <thead>
-              <tr>{renderHeaders()}</tr>
+              <tr>
+                <td>
+               
+                  <input
+                    checked={
+                      selectedRows.length === data.length && data.length > 0
+                        ? true
+                        : false
+                    }
+                    type="checkbox"
+                    className="form-check-input"
+                    onChange={onSelectAll}
+                  ></input>{" "}
+                </td>
+
+                {renderHeaders()}
+              </tr>
             </thead>
             <tbody>{renderData()}</tbody>
             <tfoot>
