@@ -9,6 +9,8 @@ import PrivateRoutes from "./layouts/PrivateRoutes";
 import PublicRoutes from "./layouts/PublicRoutes";
 import Dashboard from "./components/Dashboard";
 import Layout from "./layouts/Layout";
+import UserAdd from "./components/user/UserAdd";
+import "./css/styles.css"
 function App() {
   return (
     <Routes>
@@ -16,7 +18,8 @@ function App() {
         <Route element={<Main />}>
           <Route element={<PrivateRoutes></PrivateRoutes>}>
             <Route path="/" element={<Dashboard />} />
-            <Route path='/users' element={<UserList />} />
+            <Route path="/users" element={<UserList />} />
+            <Route path="/users/add" element={<UserAdd />} />
           </Route>
         </Route>
         <Route element={<PublicRoutes></PublicRoutes>}>
