@@ -2,7 +2,7 @@ import axios from "axios";
 export default function requestApi(
   endpoint,
   method,
-  body,
+  body = [],
   responseType = "json"
 ) {
   const headers = {

@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import * as actions from "../../redux/actions";
 import requestApi from "../../helpers/api";
 import { Button, Modal } from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
 const UserList = () => {
   const dispatch = useDispatch();
   const [users, setUsers] = useState([]);
@@ -16,7 +17,7 @@ const UserList = () => {
   const [showModal, setShowModal] = useState(false);
   const [deleteItem, setDeleteItem] = useState(null);
   const [deleteType, setDeleteType] = useState("single");
-  const [refresh, setRefresh] = useState(Date.now())
+  const [refresh, setRefresh] = useState(Date.now());
 
   useEffect(() => {
     dispatch(actions.controlLoading(true));
@@ -34,7 +35,7 @@ const UserList = () => {
         console.log(err);
         dispatch(actions.controlLoading(false));
       });
-  }, [currentPage, itemsPerPage, searchString ,refresh]);
+  }, [currentPage, itemsPerPage, searchString, refresh]);
 
   const handleDelete = (id) => {
     console.log("single Delete with id", id);
@@ -78,9 +79,13 @@ const UserList = () => {
       name: "Actions",
       element: (row) => (
         <>
-          <button type="button" className="btn btn-sm btn-warning me-1">
+          <Link
+            to={`/users/edit/${row.id}`}
+            className="btn btn-sm btn-warning me-1"
+          >
             <i className="fa fa-pencil"></i> Edit
-          </button>
+          </Link>
+
           <button
             type="button"
             className="btn btn-sm btn-danger me-1"
@@ -99,7 +104,7 @@ const UserList = () => {
       requestApi(`/user/${deleteItem}`, `DELETE`, [])
         .then((response) => {
           setShowModal(false);
-          setRefresh(Date.now())
+          setRefresh(Date.now());
           dispatch(actions.controlLoading(false));
         })
         .catch((err) => {
@@ -112,8 +117,8 @@ const UserList = () => {
       requestApi(`/user/multiple?ids=${selectedRows.toString()}`, `DELETE`, [])
         .then((response) => {
           setShowModal(false);
-          setRefresh(Date.now())
-          setSelectedRows([])
+          setRefresh(Date.now());
+          setSelectedRows([]);
           dispatch(actions.controlLoading(false));
         })
         .catch((err) => {
@@ -173,7 +178,9 @@ const UserList = () => {
         <Modal.Body>Are you sure want to delete?</Modal.Body>
         <Modal.Footer>
           <Button onClick={() => setShowModal(false)}>Close</Button>
-          <Button className="btn-danger" onClick={requestDeleteApi}>Delete</Button>
+          <Button className="btn-danger" onClick={requestDeleteApi}>
+            Delete
+          </Button>
         </Modal.Footer>
       </Modal>
     </div>
