@@ -8,6 +8,7 @@ import requestApi from "../helpers/api";
 const Profile = () => {
   const dispatch = useDispatch();
   const [profileData, setProfileData] = useState({});
+  const [isSelectedFile, setIsSelectedFile] = useState(false);
   useEffect(() => {
     dispatch(actions.controlLoading(true));
     requestApi("/user/profile", "GET")
@@ -15,7 +16,7 @@ const Profile = () => {
         console.log("res =>", res);
         setProfileData({
           ...res.data,
-          avatar: process.env.REACT_APP_API_URL + "/" + res.data.avatar
+          avatar: process.env.REACT_APP_API_URL + "/" + res.data.avatar,
         });
         dispatch(actions.controlLoading(false));
       })
@@ -34,6 +35,7 @@ const Profile = () => {
           avatar: reader.result,
           file: file,
         });
+        setIsSelectedFile(true);
       };
       reader.readAsDataURL(file);
     }
@@ -42,7 +44,13 @@ const Profile = () => {
     let formData = new FormData();
     formData.append("avatar", profileData.file);
     dispatch(actions.controlLoading(true));
-    requestApi("/user/upload-avatar", 'POST', formData, 'json',"multipart/form-data")
+    requestApi(
+      "/user/upload-avatar",
+      "POST",
+      formData,
+      "json",
+      "multipart/form-data"
+    )
       .then((res) => {
         console.log("res=>", res);
         dispatch(actions.controlLoading(false));
@@ -91,10 +99,15 @@ const Profile = () => {
                       onChange={onImageChange}
                     />
                   </div>
-                  <button className="btn btn-sm btn-success float-end" onClick={handleUpdateAvatar}>
-                    {" "}
-                    update{" "}
-                  </button>
+                  {isSelectedFile && (
+                    <button
+                      className="btn btn-sm btn-success float-end"
+                      onClick={handleUpdateAvatar}
+                    >
+                      {" "}
+                      update{" "}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
