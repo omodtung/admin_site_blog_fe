@@ -10,8 +10,10 @@ import PublicRoutes from "./layouts/PublicRoutes";
 import Dashboard from "./components/Dashboard";
 import Layout from "./layouts/Layout";
 import UserAdd from "./components/user/UserAdd";
-import "./css/styles.css"
+import "./css/styles.css";
 import UserUpdate from "./components/user/UserUpdate";
+import PageNotFound from "./components/PageNotFound";
+import Profile from "./components/Profile";
 function App() {
   return (
     <Routes>
@@ -21,7 +23,8 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/users" element={<UserList />} />
             <Route path="/users/add" element={<UserAdd />} />
-            <Route path="/users/edit/:id" element={<UserUpdate/>}/>
+            <Route path="/users/edit/:id" element={<UserUpdate />} />
+            <Route path="/profile" element={<Profile></Profile>} />
           </Route>
         </Route>
         <Route element={<PublicRoutes></PublicRoutes>}>
@@ -29,6 +32,8 @@ function App() {
           <Route path="/register" element={<Register />} />
         </Route>
       </Route>
+
+      <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
 }
