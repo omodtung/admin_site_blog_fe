@@ -13,7 +13,9 @@ import UserAdd from "./components/user/UserAdd";
 import "./css/styles.css";
 import UserUpdate from "./components/user/UserUpdate";
 import PageNotFound from "./components/PageNotFound";
+import PostList from "./components/post/PostList";
 import Profile from "./components/Profile";
+import PostAdd from "./components/post/PostAdd";
 function App() {
   return (
     <Routes>
@@ -25,6 +27,8 @@ function App() {
             <Route path="/users/add" element={<UserAdd />} />
             <Route path="/users/edit/:id" element={<UserUpdate />} />
             <Route path="/profile" element={<Profile></Profile>} />
+            <Route path="/posts" element={<PostList></PostList>} />
+            <Route path="/post/add" element={<PostAdd></PostAdd>}/>
           </Route>
         </Route>
         <Route element={<PublicRoutes></PublicRoutes>}>
