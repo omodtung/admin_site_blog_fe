@@ -6,7 +6,21 @@ import { useDispatch } from "react-redux";
 import requestApi from "../../helpers/api";
 // import { Toast } from "react-toastify/dist/components";
 import { toast } from "react-toastify";
-import { CKEditor } from "@ckeditor/ckeditor5-react";
+
+import {
+  ClassicEditor,
+  Context,
+  Bold,
+  Essentials,
+  Italic,
+  Paragraph,
+  ContextWatchdog,
+} from "ckeditor5";
+import { CKEditor, CKEditorContext } from "@ckeditor/ckeditor5-react";
+
+import "ckeditor5/ckeditor5.css";
+import { eventWrapper } from "@testing-library/user-event/dist/utils";
+
 const PostAdd = () => {
   const {
     register,
@@ -58,7 +72,6 @@ const PostAdd = () => {
           </ol>
 
           <div className="mb-3">
-           
             <br></br>
             <div className="card-body">
               <form>
@@ -76,33 +89,30 @@ const PostAdd = () => {
                       />
                       <label for="inputFirstName"> Title </label>
                       {errors.title && (
-                        <p style={{ color: "red" }}>
-                          {errors.title.message}
-                        </p>
+                        <p style={{ color: "red" }}>{errors.title.message}</p>
                       )}
                     </div>
                   </div>
+
+                  {/* status */}
                   <div class="col-md-6">
-                    <div class="form-floating">
-                      <input
-                        class="form-control"
-                        id="inputLastName"
-                        type="text"
-                        placeholder="Enter Your Description"
-                        {...register("description", {
-                          required: "Description Is Required",
+                    <div class="form-floating mb-3 mb-md-0">
+                      <select
+                        {...register("status", {
+                          required: "status Is Required  ",
                         })}
-                      />
-                      <label for="inputLastName"> Description</label>
-                      {errors.description && (
-                        <p style={{ color: "red" }}>
-                          {errors.description.message}
-                        </p>
+                        className="form-select"
+                      >
+                        <option value="1"> Active</option>
+                        <option value="2"> InActive</option>
+                      </select>
+                      <label for="inputEmail">Status</label>
+                      {errors.status && (
+                        <p style={{ color: "red" }}>{errors.status.message}</p>
                       )}
                     </div>
                   </div>
                 </div>
-              
                 <div class="row mb-3">
                   <div class="col-md-6">
                     <div class="form-floating mb-3 mb-md-0">
@@ -117,76 +127,88 @@ const PostAdd = () => {
                       />
                       <label for="inputPassword">Summary </label>
                       {errors.summary && (
-                        <p style={{ color: "red" }}>
-                          {errors.summary.message}
-                        </p>
+                        <p style={{ color: "red" }}>{errors.summary.message}</p>
                       )}
                     </div>
                   </div>
 
-                  {/* <div className="row mb-3"> */}
-
-                  {/* </div> */}
-
-                  <div class="col-md-6">
-                    <div class="form-floating mb-3 mb-md-0">
-                      <select
-                        {...register("status", {
-                          required: "status Is Required  ",
-                        })}
-                        className="form-select"
-                      >
-                        <option value="1"> Active</option>
-                        <option value="2"> InActive</option>
-                      </select>
-                      <label for="inputEmail">Status</label>
-                      {errors.status && (
-                        <p style={{ color: "red" }}>{errors.status.message}</p>
-                      )}
-                    </div>
-                  </div>
+                 
                 </div>
-                <div class="row mb-3">
-                  <div class="col-md-6">
-                    <div class="form-floating mb-3 mb-md-0">
-                      <input
-                        class="form-control"
-                        id="inputPassword"
-                        type="password"
-                        placeholder="Create a password"
-                        {...register("password", {
-                          required: "Password Is Required",
-                        })}
-                      />
-                      <label for="inputPassword">Password</label>
-                      {errors.password && (
-                        <p style={{ color: "red" }}>
-                          {errors.password.message}
-                        </p>
-                      )}
-                    </div>
+                <div class="card mb-4">
+            <div class="card-body">
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <img
+                    // src={
+                    //   profileData.avatar
+                    //     ? profileData.avatar
+                    //     : "../assets/images/default_pic_ava.png"
+                    // }
+                    className="profile-user"
+                  />
+                  <div className="input-file float-start">
+                    <label
+                      htmlFor="file"
+                      className="btn-file btn-sm btn btn-primary"
+                    >
+                      {" "}
+                      Browse File{" "}
+                    </label>
+                    <input
+                      id="file"
+                      type="file"
+                      accept="image/*"
+                      // onChange={onImageChange}
+                    />
                   </div>
+                  {/* {isSelectedFile && ( */}
+                    <button
+                      className="btn btn-sm btn-success float-end"
+                      // onClick={handleUpdateAvatar}
+                    >
+                      {" "}
+                      update{" "}
+                    </button>
+                  {/* )} */}
+                </div>
+              </div>
+            </div>
+          </div>
+                {/* Description  */}
+                <div class="col-md-6">
+                  <div class="form-floating">
+                    <label for="inputLastName"> Description</label>
+                    {errors.description && (
+                      <p style={{ color: "red" }}>
+                        {errors.description.message}
+                      </p>
+                    )}
 
-                  {/* <div className="row mb-3"> */}
+                    <CKEditorContext
+                      context={Context}
+                      contextWatchdog={ContextWatchdog}
+                    >
+                      <CKEditor
+                    
+                        editor={ClassicEditor}
+                        config={{
+                          plugins: [Essentials, Bold, Italic, Paragraph],
+                          toolbar: ["undo", "redo", "|", "bold", "italic"],
+                        }}
+                        data="<p>Hello from the first editor working with the context!</p>"
+                        onReady={(editor) => {
+                          // You can store the "editor" and use when it is needed.
+                          console.log("Editor 1 is ready to use!", editor);
+                          register('description',{required:'Description is Required'})
+                        }}
+                        onChange={(event,editor) =>
+                        {
+                          const data = editor.getData();
+                          console.log ({event,editor,data})
 
-                  {/* </div> */}
-
-                  <div class="col-md-6">
-                    <div class="form-floating mb-3 mb-md-0">
-                      <select
-                        {...register("status", {
-                          required: "status Is Required  ",
-                        })}
-                        className="form-select"
-                      >
-                        <option value="1"> Active</option>
-                        <option value="2"> InActive</option>
-                      </select>
-                      <label for="inputEmail">Status</label>
-                      {errors.status && (
-                        <p style={{ color: "red" }}>{errors.status.message}</p>
-                      )}
-                    </div>
+                        }}
+                      />
+                    </CKEditorContext>
                   </div>
                 </div>
                 <button
