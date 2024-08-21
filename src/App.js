@@ -16,6 +16,7 @@ import PageNotFound from "./components/PageNotFound";
 import PostList from "./components/post/PostList";
 import Profile from "./components/Profile";
 import PostAdd from "./components/post/PostAdd";
+import PostUpdate from "./components/post/PostUpdate";
 function App() {
   return (
     <Routes>
@@ -29,6 +30,7 @@ function App() {
             <Route path="/profile" element={<Profile></Profile>} />
             <Route path="/posts" element={<PostList></PostList>} />
             <Route path="/post/add" element={<PostAdd></PostAdd>}/>
+            <Route path="/post/edit/:id" element={<PostUpdate></PostUpdate>}/>
           </Route>
         </Route>
         <Route element={<PublicRoutes></PublicRoutes>}>
