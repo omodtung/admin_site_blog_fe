@@ -70,6 +70,10 @@ const PostList = () => {
       ),
     },
     {
+      name: "Summary",
+      element: (row) => row.summary,
+    },
+    {
       name: "Status",
       element: (row) => (row.status == 1 ? "Active" : "Inactive"),
     },
@@ -86,7 +90,7 @@ const PostList = () => {
       element: (row) => (
         <>
           <Link
-            to={`/posts/edit/${row.id}`}
+            to={`/post/edit/${row.id}`}
             className="btn btn-sm btn-warning me-1"
           >
             <i className="fa fa-pencil"></i> Edit
@@ -146,10 +150,7 @@ const PostList = () => {
             <li className="breadcrumb-item active">Tables</li>
           </ol>
           <div className="mb-3">
-            <button type="button" className="btn btn-sm btn-success me-2">
-              <i className="fa fa-plus"></i> Add new
-            </button>
-
+           
             <button
               type="button"
               className="btn btn-sm btn-danger"

@@ -1,6 +1,6 @@
 import React, { useDebugValue, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { set, useForm } from "react-hook-form";
 import * as actions from "../../redux/actions";
 import { useDispatch } from "react-redux";
 import requestApi from "../../helpers/api";
@@ -22,7 +22,7 @@ import { CKEditor, CKEditorContext } from "@ckeditor/ckeditor5-react";
 import "ckeditor5/ckeditor5.css";
 import { eventWrapper } from "@testing-library/user-event/dist/utils";
 
-const PostAdd = () => {
+const PostUpdate = () => {
   const {
     register,
     handleSubmit,
@@ -30,61 +30,119 @@ const PostAdd = () => {
     trigger,
     formState: { errors },
   } = useForm();
-
+  const param = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [thumbnail, setThumbnail] = useState([]);
   const [category, setCategory] = useState([]);
-  const handleSubmitFormAdd = async (data) => {
-    console.log("data form = >", data);
-    // dispatch(actions.controlLoading(true));
+  const [postData, setPostData] = useState({});
+  const handleSubmitFormUpdate = async (data) => {
+    console.log("data form ----------------------------------= >", data);
+    dispatch(actions.controlLoading(true));
     let formData = new FormData();
+    console.log("form-data =>", formData);
     for (let key in data) {
       if (key == "thumbnail") {
-        formData.append(key, data[key][0]);
+        if (data.thumbnail[0] instanceof File) {
+          formData.append(key, data[key][0]);
+        }
       } else {
         formData.append(key, data[key]);
       }
     }
-    dispatch(actions.controlLoading(true))
-    try
-    {
-      const res = await requestApi('/post','POST',formData,'json','multipart/form-data');
-      console.log ("res=>" , res);
-      dispatch(actions.controlLoading(false))
-      toast.success('User has been  created succesfully',{position :'top-center',autoClose:2000});
-setTimeout(()=>navigate('/posts'),3000)
-
-    }
-    catch(error)
-    {
-      console.log ("error =>",error )
-      dispatch (actions.controlLoading(false))
+    dispatch(actions.controlLoading(true));
+    try {
+      const res = await requestApi(
+        `/post/${param.id}`,
+        "PATCH",
+        formData,
+        "json",
+        "multipart/form-data"
+      );
+      console.log("res=>", res);
+      dispatch(actions.controlLoading(false));
+      // toast.success("Post has been  created succesfully", {
+      //   position: "top-center",
+      //   autoClose: 2000,
+      // });
+      setTimeout(() => navigate("/posts"), 3000);
+    } catch (error) {
+      console.log("error =>", error);
+      dispatch(actions.controlLoading(false));
     }
   };
 
+  // const onThumbnailChange = (event) => {
+  //   if ( event.target.files[0]) {
+  //     const file = event.target.files[0];
+  //     let reader = new FileReader();
+  //     reader.onload = (e) => {
+  //       setPostData({ ...postData, thumbnail: reader.result,  file: file, });
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
   const onThumbnailChange = (event) => {
-    if (event.target.files && event.target.files[0]) {
+    if (event.target.files[0] && event.target.files) {
+      // const file = event.target.files[0];
       let reader = new FileReader();
       reader.onload = (e) => {
-        setThumbnail(reader.result);
+        setPostData({
+          ...postData,
+          thumbnail: reader.result,
+        });
       };
       reader.readAsDataURL(event.target.files[0]);
     }
   };
-
   useEffect(() => {
     dispatch(actions.controlLoading(true));
-    requestApi("/category", "GET")
-      .then((res) => {
-        console.log("res=>", res);
+    // requestApi("/category", "GET")
+    //   .then((rest) => {
+    //     console.log("res=>", rest);
+    //     setCategory(rest.data);
+    //     dispatch(actions.controlLoading(false));
+    //   })
+    //   .catch((err) => {
+    //     console.log("err = >", err);
+    //     dispatch(actions.controlLoading(false));
+    //   });
+
+    try {
+      const renderData = async () => {
+        const res = await requestApi("/category", "GET");
+        console.log("res =>", res);
         setCategory(res.data);
+        const detailPost = await requestApi(`/post/${param.id}`, "GET");
+        console.log("detailPost=>", detailPost);
+        const fields = [
+          "title",
+          "summary",
+          "description",
+          "thumbnail",
+          "category",
+          "status",
+        ];
+        fields.forEach((field) => {
+          if (field == "category") {
+            setValue(field, detailPost.data[field].id);
+          } else {
+            setValue(field, detailPost.data[field]);
+          }
+        });
+        setPostData({
+          ...detailPost.data,
+          thumbnail:
+            process.env.REACT_APP_API_URL + "/" + detailPost.data.thumbnail,
+        });
+
         dispatch(actions.controlLoading(false));
-      })
-      .catch((err) => {
-        console.log("err = >", err);
-        dispatch(actions.controlLoading(false));
-      });
+      };
+      renderData();
+    } catch (err) {
+      console.log("err =>", err);
+      dispatch(actions.controlLoading(false));
+    }
   }, []);
   return (
     <div id="layoutSidenav_content">
@@ -194,13 +252,8 @@ setTimeout(()=>navigate('/posts'),3000)
                     <div class="row mb-3">
                       <div class="col-md-4">
                         <img
-                          // src={
-                          //   profileData.avatar
-                          //     ? profileData.avatar
-                          //     : "../assets/images/default_pic_ava.png"
-                          // }
+                          src={postData.thumbnail}
                           className="profile-user"
-                          src={thumbnail}
                         />
                         <div className="input-file float-start">
                           <label
@@ -213,23 +266,17 @@ setTimeout(()=>navigate('/posts'),3000)
                           <input
                             id="file"
                             type="file"
-                            accept="image/*"
-                            // onChange={onImageChange}
+                            // onChange={onThumbnailChange}
+
                             name="thumbnail"
-                            {...register("thumbnail", {
-                              required: "Thumbnail is Required",
-                              onChange: onThumbnailChange,
-                            })}
+                            {...register("thumbnail", {onChange:onThumbnailChange})}
+                            accept="image/*"
+
+                            // onChange={onThumbnailChange}
                           />
                         </div>
                         {/* {isSelectedFile && ( */}
-                        <button
-                          className="btn btn-sm btn-success float-end"
-                          // onClick={handleUpdateAvatar}
-                        >
-                          {" "}
-                          update{" "}
-                        </button>
+
                         {/* )} */}
                       </div>
                     </div>
@@ -250,11 +297,12 @@ setTimeout(()=>navigate('/posts'),3000)
                     >
                       <CKEditor
                         editor={ClassicEditor}
+                        data={postData.description}
                         config={{
                           plugins: [Essentials, Bold, Italic, Paragraph],
                           toolbar: ["undo", "redo", "|", "bold", "italic"],
                         }}
-                        data="<p>Hello from the first editor working with the context!</p>"
+                        // data="<p>Hello from the first editor working with the context!</p>"
                         onReady={(editor) => {
                           // You can store the "editor" and use when it is needed.
                           console.log("Editor 1 is ready to use!", editor);
@@ -273,9 +321,10 @@ setTimeout(()=>navigate('/posts'),3000)
                     </CKEditorContext>
                   </div>
                 </div>
+
                 <button
                   type="button"
-                  onClick={handleSubmit(handleSubmitFormAdd)}
+                  onClick={handleSubmit(handleSubmitFormUpdate)}
                   className="btn btn-success"
                 >
                   {" "}
@@ -290,4 +339,4 @@ setTimeout(()=>navigate('/posts'),3000)
   );
 };
 
-export default PostAdd;
+export default PostUpdate;
