@@ -11699,6 +11699,10 @@ body {
 .profile-user {
   height: 500px;
   width: 500px;
-
-
 }
+
+.ck-editor__editable_inline {
+  min-height: 500px !important;
+  min-width: 800px;
+}
+

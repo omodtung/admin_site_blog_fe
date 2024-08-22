@@ -7,7 +7,7 @@ import requestApi from "../../helpers/api";
 
 // import { Toast } from "react-toastify/dist/components";
 import { toast } from "react-toastify";
-
+import CustomUploadAdapter from "../../helpers/CustomeUpdateAdapter";
 import {
   ClassicEditor,
   Context,
@@ -21,6 +21,9 @@ import { CKEditor, CKEditorContext } from "@ckeditor/ckeditor5-react";
 
 import "ckeditor5/ckeditor5.css";
 import { eventWrapper } from "@testing-library/user-event/dist/utils";
+
+
+
 
 const PostAdd = () => {
   const {
@@ -52,7 +55,7 @@ const PostAdd = () => {
       const res = await requestApi('/post','POST',formData,'json','multipart/form-data');
       console.log ("res=>" , res);
       dispatch(actions.controlLoading(false))
-      toast.success('User has been  created succesfully',{position :'top-center',autoClose:2000});
+      // toast.success('User has been  created succesfully',{position :'top-center',autoClose:2000});
 setTimeout(()=>navigate('/posts'),3000)
 
     }
@@ -72,6 +75,15 @@ setTimeout(()=>navigate('/posts'),3000)
       reader.readAsDataURL(event.target.files[0]);
     }
   };
+ 
+
+
+function  UploadAdapterPlugin( editor ) {
+  editor.plugins.get( 'FileRepository' ).createUploadAdapter = ( loader ) => {
+      // Configure the URL to the upload script in your backend here!
+      return new CustomUploadAdapter( loader );
+  };
+}
 
   useEffect(() => {
     dispatch(actions.controlLoading(true));
@@ -202,12 +214,12 @@ setTimeout(()=>navigate('/posts'),3000)
                           className="profile-user"
                           src={thumbnail}
                         />
-                        <div className="input-file float-start">
+                        <div className="input-file" >
                           <label
                             htmlFor="file"
                             className="btn-file btn-sm btn btn-primary"
                           >
-                            {" "}
+                           
                             Browse File{" "}
                           </label>
                           <input
@@ -223,13 +235,10 @@ setTimeout(()=>navigate('/posts'),3000)
                           />
                         </div>
                         {/* {isSelectedFile && ( */}
-                        <button
-                          className="btn btn-sm btn-success float-end"
-                          // onClick={handleUpdateAvatar}
-                        >
-                          {" "}
-                          update{" "}
-                        </button>
+                    
+
+
+                        
                         {/* )} */}
                       </div>
                     </div>
@@ -247,12 +256,18 @@ setTimeout(()=>navigate('/posts'),3000)
                     <CKEditorContext
                       context={Context}
                       contextWatchdog={ContextWatchdog}
-                    >
+                      // config={{
+                      //  extraPlugins : [UploadAdapterPlugin]
+                      // }}
+                      
+                      
+                    > 
                       <CKEditor
                         editor={ClassicEditor}
                         config={{
-                          plugins: [Essentials, Bold, Italic, Paragraph],
+                          plugins: [Essentials, Bold, Italic, Paragraph ],
                           toolbar: ["undo", "redo", "|", "bold", "italic"],
+                        // extraPlugins : [UploadAdapterPlugin]
                         }}
                         data="<p>Hello from the first editor working with the context!</p>"
                         onReady={(editor) => {
@@ -269,8 +284,18 @@ setTimeout(()=>navigate('/posts'),3000)
                           trigger("description");
                         }}
                         className="ckeditor-editor"
+                       
                       />
+                      {/* <input
+                            id="file"
+                            type="file"
+                            accept="image/*"
+                            // onChange={onImageChange}
+
+                          /> */}
+
                     </CKEditorContext>
+                    
                   </div>
                 </div>
                 <button
@@ -282,7 +307,9 @@ setTimeout(()=>navigate('/posts'),3000)
                   SubMit
                 </button>
               </form>
+
             </div>
+
           </div>
         </div>
       </main>
