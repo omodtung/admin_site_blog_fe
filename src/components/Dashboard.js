@@ -24,7 +24,7 @@ const Dashboard = () => {
     //   .catch((err) => {
     //     console.log(err);
     //   });
-
+// song song api user and post thuc hien phia frontend
     const promiseUser = requestApi("/user", "GET");
     const promisePost = requestApi("/post", "GET");
 

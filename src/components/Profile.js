@@ -9,6 +9,7 @@ const Profile = () => {
   const dispatch = useDispatch();
   const [profileData, setProfileData] = useState({});
   const [isSelectedFile, setIsSelectedFile] = useState(false);
+  //call back in useEffect
   useEffect(() => {
     dispatch(actions.controlLoading(true));
     requestApi("/user/profile", "GET")
