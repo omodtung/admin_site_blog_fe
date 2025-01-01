@@ -103,6 +103,7 @@ function  UploadAdapterPlugin( editor ) {
       <main>
         <div className="container-fluid px-4">
           <h1 className="mt-4">Tables</h1>
+          <h1 className="mt-4">Tables 2</h1>
           <ol className="breadcrumb mb-4">
             <li className="breadcrumb-item">
               {/* <a href="index.html">Dashboard</a>
